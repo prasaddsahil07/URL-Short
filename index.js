@@ -1,6 +1,8 @@
 const express = require("express");
+const path = require("path");
 const urlRoute = require("./routes/url");
 const URL = require('./models/url');
+const staticRoute = require("./routes/staticRouter");
 const { connectToMongoDB } = require("./connect");
 const { DB_NAME } = require("./constant")
 const app = express();
@@ -12,9 +14,15 @@ connectToMongoDB(`${process.env.MONGO_URI}/${DB_NAME}`)
         () => console.log("MongoDB connected"))
     .catch(error => console.error("MongoDB connection error:", error));
 
+app.set("view engine", "ejs");
+app.set("views", path.resolve("./views"));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/url", urlRoute);
+
+app.use("/", staticRoute);
 
 app.get('/:shortId', async (req, res) => {
     try {
