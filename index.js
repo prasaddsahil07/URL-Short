@@ -10,8 +10,7 @@ const app = express();
 const PORT=8001;
 
 connectToMongoDB(`${process.env.MONGO_URI}/${DB_NAME}`)
-    .then(
-        () => console.log("MongoDB connected"))
+    .then(() => console.log("MongoDB connected"))
     .catch(error => console.error("MongoDB connection error:", error));
 
 app.set("view engine", "ejs");
