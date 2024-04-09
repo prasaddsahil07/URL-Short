@@ -10,8 +10,7 @@ const app = express();
 const PORT=8001;
 
 connectToMongoDB(`${process.env.MONGO_URI}/${DB_NAME}`)
-    .then({ useNewUrlParser: true, useUnifiedTopology: true },
-        () => console.log("MongoDB connected"))
+    .then(() => console.log("MongoDB connected"))
     .catch(error => console.error("MongoDB connection error:", error));
 
 app.set("view engine", "ejs");
@@ -20,11 +19,20 @@ app.set("views", path.resolve("./views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use((req,res,next)=>{
+    const now = Date.now();
+    const start = new Date();
+    next();
+    const time = Date.now()-now;
+    console.log(`Request Logged @${start} From: ${req.method} ${req.baseUrl}${req.url} ${time}ms`);
+});
+
 app.use("/url", urlRoute);
 
 app.use("/", staticRoute);
 
 app.get('/:shortId', async (req, res) => {
+    console.log(req.body);
     try {
         const shortId = req.params.shortId;
         const result = await URL.findOneAndUpdate(
